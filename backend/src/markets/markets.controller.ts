@@ -8,11 +8,12 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { PredictionStatsDto } from './dto/prediction-stats.dto';
 import {
   ApiOperation,
   ApiResponse,
-  ApiBearerAuth,
   ApiTags,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { MarketsService } from './markets.service';
 import { Market } from './entities/market.entity';
@@ -29,6 +30,21 @@ import { User } from '../users/entities/user.entity';
 @Controller('markets')
 export class MarketsController {
   constructor(private readonly marketsService: MarketsService) {}
+
+  @Get(':id/predictions')
+  @Public()
+  @ApiOperation({ summary: 'Get prediction statistics for a market' })
+  @ApiResponse({
+    status: 200,
+    description: 'Prediction statistics by outcome',
+    type: [PredictionStatsDto],
+  })
+  @ApiResponse({ status: 404, description: 'Market not found' })
+  async getMarketPredictions(
+    @Param('id') id: string,
+  ): Promise<PredictionStatsDto[]> {
+    return this.marketsService.getPredictionStats(id);
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
