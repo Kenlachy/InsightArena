@@ -2,7 +2,7 @@
 
 import CompetitionsJoined from "@/component/CompetitionsJoined";
 import EventsCompetitionsHero from "@/component/events/EventsCompetitionsHero";
-import WhyJoinValueGrid from "@/component/competition/WhyJoinValueGrid";
+import WhyJoinValueGrid from "@/component/events/WhyJoinValueGrid";
 
 export default function CompetitionsDemoPage() {
   return (

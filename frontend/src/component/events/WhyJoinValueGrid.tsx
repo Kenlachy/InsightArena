@@ -21,7 +21,7 @@ const Card: React.FC<{
   iconKey?: string;
 }> = ({ title, subtitle, bullets, iconBg, iconKey }) => {
   return (
-    <div className="bg-[#2a3441] p-6 rounded-lg">
+    <div className="bg-[#161A32] p-6 rounded-lg">
       <div className="flex flex-col items-start gap-4">
         {/* Icon placeholder - replace with your icon library component */}
         <div
@@ -35,8 +35,8 @@ const Card: React.FC<{
         </div>
 
         <div className="flex flex-col gap-2">
-          <h3 className="text-white font-semibold text-lg">{title}</h3>
-          <p className="text-slate-300 mt-1 text-sm max-w-md">{subtitle}</p>
+          <h3 className="text-white font-bold text-lg">{title}</h3>
+          <p className="text-white/50 mt-1 text-sm max-w-md">{subtitle}</p>
         </div>
       </div>
 
@@ -48,12 +48,12 @@ const Card: React.FC<{
           >
             {/* Bullet placeholder - replace with icon from your library */}
             <span
-              className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#4FD1C5] shrink-0"
+              className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#00D4FF] shrink-0"
               aria-hidden
             >
               <FaCheck className="w-3 h-3 text-[#2a3441]" aria-hidden />
             </span>
-            <span>{b}</span>
+            <span className="text-gray-400">{b}</span>
           </li>
         ))}
       </ul>
@@ -81,7 +81,7 @@ const CARDS: Array<{
       "Exclusive NFT badges",
       "Weekly top rewards",
     ],
-    iconBg: "bg-linear-to-tr from-yellow-400 via-orange-400 to-rose-400",
+    iconBg: "bg-linear-to-br from-[#00D4FF] via-[#4F90FA] to-[#746FF7]",
     iconKey: "trophy",
   },
   {
@@ -93,7 +93,7 @@ const CARDS: Array<{
       "Expert Q&A events",
       "Premium leaderboard access",
     ],
-    iconBg: "bg-linear-to-tr from-sky-500 via-blue-500 to-indigo-600",
+    iconBg: "bg-linear-to-br from-[#00D4FF] via-[#4F90FA] to-[#746FF7]",
     iconKey: "learn",
   },
   {
@@ -105,7 +105,7 @@ const CARDS: Array<{
       "Public performance stats",
       "Unlockable badges",
     ],
-    iconBg: "bg-linear-to-tr from-emerald-400 via-green-400 to-teal-500",
+    iconBg: "bg-linear-to-br from-[#00D4FF] via-[#4F90FA] to-[#746FF7]",
     iconKey: "chart",
   },
   {
@@ -117,7 +117,7 @@ const CARDS: Array<{
       "Collaborative opportunities",
       "Mentorship programs",
     ],
-    iconBg: "bg-linear-to-tr from-purple-500 via-fuchsia-500 to-pink-500",
+    iconBg: "bg-linear-to-br from-[#00D4FF] via-[#4F90FA] to-[#746FF7]",
     iconKey: "network",
   },
 ];
@@ -126,7 +126,7 @@ export default function WhyJoinValueGrid() {
   return (
     <section className="w-full py-12 sm:py-18 md:py-24">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-center text-white text-2xl sm:text-3xl md:text-4xl font-bold mb-8 sm:mb-12">
+        <h2 className="text-center text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-8 sm:mb-12">
           Why Join InsightArena?
         </h2>
 
