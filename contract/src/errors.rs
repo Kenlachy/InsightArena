@@ -115,7 +115,7 @@ pub enum InsightArenaError {
     // ── User ──────────────────────────────────────────────────────────────────
     /// No user profile exists for the given address.
     /// Raised when a user stats lookup finds no stored profile.
-    UserNotFound = 60,
+    UserNotFound = 63,
 
     // ── General ───────────────────────────────────────────────────────────────
     /// An arithmetic operation produced a value outside the valid i128/u32 range.
