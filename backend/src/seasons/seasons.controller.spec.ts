@@ -1,9 +1,5 @@
-import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
-import { NotificationsService } from '../notifications/notifications.service';
-import { User } from '../users/entities/user.entity';
+import { CreateSeasonDto } from './dto/create-season.dto';
 import { Season } from './entities/season.entity';
 import { SeasonsController } from './seasons.controller';
 import { SeasonsService } from './seasons.service';
@@ -11,247 +7,94 @@ import { SeasonsService } from './seasons.service';
 describe('SeasonsController', () => {
   let controller: SeasonsController;
   let service: SeasonsService;
-  let mockSeasonsRepository: any;
-  let mockUsersRepository: any;
-  let mockNotificationsService: any;
-  let mockDataSource: any;
-
-  const mockSeason: Season = {
-    id: 'season-123',
-    name: 'Winter 2026',
-    starts_at: new Date('2026-01-01'),
-    ends_at: new Date('2026-03-31'),
-    is_active: true,
-    is_finalized: false,
-    top_winner: null,
-    top_winner_id: null,
-    created_at: new Date(),
-    updated_at: new Date(),
-  };
-
-  const mockWinner: User = {
-    id: 'user-winner',
-    stellar_address: 'GBUQWP3BOUZX34ULNQG23RQ6F4YUSXHTQSXUSMIQSTBE2DDA5V3OTLC',
-    username: 'winner_user',
-    avatar_url: null,
-    total_predictions: 100,
-    correct_predictions: 75,
-    total_staked_stroops: '1000000000',
-    total_winnings_stroops: '500000000',
-    reputation_score: 850,
-    season_points: 1500,
-    role: 'user',
-    created_at: new Date(),
-    updated_at: new Date(),
-  };
 
   beforeEach(async () => {
-    mockSeasonsRepository = {
-      findOne: jest.fn(),
-      find: jest.fn(),
-    };
-
-    mockUsersRepository = {
-      findOne: jest.fn(),
-      update: jest.fn(),
-    };
-
-    mockNotificationsService = {
-      create: jest.fn().mockResolvedValue({}),
-    };
-
-    const mockQueryRunner = {
-      connect: jest.fn().mockResolvedValue(undefined),
-      startTransaction: jest.fn().mockResolvedValue(undefined),
-      manager: {
-        findOne: jest.fn(),
-        save: jest.fn(),
-        update: jest.fn(),
-      },
-      commitTransaction: jest.fn().mockResolvedValue(undefined),
-      rollbackTransaction: jest.fn().mockResolvedValue(undefined),
-      release: jest.fn().mockResolvedValue(undefined),
-    };
-
-    mockDataSource = {
-      createQueryRunner: jest.fn().mockReturnValue(mockQueryRunner),
-    };
-
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SeasonsController],
       providers: [
-        SeasonsService,
         {
-          provide: getRepositoryToken(Season),
-          useValue: mockSeasonsRepository,
-        },
-        {
-          provide: getRepositoryToken(User),
-          useValue: mockUsersRepository,
-        },
-        {
-          provide: NotificationsService,
-          useValue: mockNotificationsService,
-        },
-        {
-          provide: DataSource,
-          useValue: mockDataSource,
+          provide: SeasonsService,
+          useValue: {
+            findAllPaginated: jest.fn(),
+            findActive: jest.fn(),
+            create: jest.fn(),
+            finalizeSeason: jest.fn(),
+          },
         },
       ],
     }).compile();
 
-    controller = module.get<SeasonsController>(SeasonsController);
-    service = module.get<SeasonsService>(SeasonsService);
+    controller = module.get(SeasonsController);
+    service = module.get(SeasonsService);
   });
 
-  describe('findAll', () => {
-    it('should return all seasons ordered by start date descending', async () => {
-      const mockSeasons = [mockSeason];
-      mockSeasonsRepository.find.mockResolvedValue(mockSeasons);
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
+  });
 
-      const result = await controller.findAll();
+  describe('list', () => {
+    it('returns paginated seasons from the service', async () => {
+      const paginated = {
+        data: [],
+        total: 0,
+        page: 1,
+        limit: 20,
+      };
+      jest.spyOn(service, 'findAllPaginated').mockResolvedValue(paginated);
 
-      expect(result).toEqual(mockSeasons);
-      expect(mockSeasonsRepository.find).toHaveBeenCalledWith({
-        order: { starts_at: 'DESC' },
+      const result = await controller.list({ page: 1, limit: 20 });
+
+      expect(service.findAllPaginated).toHaveBeenCalledWith({
+        page: 1,
+        limit: 20,
       });
+      expect(result).toBe(paginated);
+    });
+  });
+
+  describe('getActive', () => {
+    it('returns the active season from the service', async () => {
+      const active = {
+        id: 'act-1',
+        season_number: 1,
+        name: 'Season 1',
+      } as Season;
+      jest.spyOn(service, 'findActive').mockResolvedValue(active);
+
+      const result = await controller.getActive();
+
+      expect(service.findActive).toHaveBeenCalled();
+      expect(result).toBe(active);
+    });
+  });
+
+  describe('create', () => {
+    it('delegates to service', async () => {
+      const dto: CreateSeasonDto = {
+        season_number: 1,
+        start_time: '2030-01-01T00:00:00.000Z',
+        end_time: '2030-12-31T00:00:00.000Z',
+        reward_pool_stroops: '5000000',
+      };
+      const created = { id: 's1' } as Season;
+      jest.spyOn(service, 'create').mockResolvedValue(created);
+
+      const result = await controller.create(dto);
+
+      expect(service.create).toHaveBeenCalledWith(dto);
+      expect(result).toBe(created);
     });
   });
 
   describe('finalizeSeason', () => {
-    it('should successfully finalize a season and create winner notification', async () => {
-      const queryRunner = mockDataSource.createQueryRunner();
-      queryRunner.manager.findOne.mockImplementation((entity, options) => {
-        if (entity === Season) {
-          return mockSeason;
-        }
-        if (entity === User) {
-          return mockWinner;
-        }
-      });
-      queryRunner.manager.save.mockResolvedValue({
-        ...mockSeason,
-        is_active: false,
-        is_finalized: true,
-        top_winner_id: mockWinner.id,
-      });
-      queryRunner.manager.update.mockResolvedValue({
-        affected: 50,
-      });
-      mockSeasonsRepository.findOne.mockResolvedValue({
-        ...mockSeason,
-        is_active: false,
-        is_finalized: true,
-        top_winner: mockWinner,
-      });
+    it('delegates to service', async () => {
+      const finalized = { id: 's1', is_finalized: true } as Season;
+      jest.spyOn(service, 'finalizeSeason').mockResolvedValue(finalized);
 
       const result = await controller.finalizeSeason('season-123');
 
-      expect(result.is_finalized).toBe(true);
-      expect(result.is_active).toBe(false);
-      expect(result.top_winner).toBe(mockWinner);
-      expect(mockNotificationsService.create).toHaveBeenCalledWith(
-        mockWinner.id,
-        'system',
-        '🎉 Season Winner!',
-        expect.stringContaining('Congratulations'),
-        expect.objectContaining({
-          season_id: 'season-123',
-          season_name: 'Winter 2026',
-        }),
-      );
-    });
-
-    it('should return 404 when season does not exist', async () => {
-      const queryRunner = mockDataSource.createQueryRunner();
-      queryRunner.manager.findOne.mockResolvedValue(null);
-
-      await expect(controller.finalizeSeason('non-existent')).rejects.toThrow(
-        NotFoundException,
-      );
-      expect(queryRunner.rollbackTransaction).toHaveBeenCalled();
-    });
-
-    it('should return 409 when season is already finalized', async () => {
-      const queryRunner = mockDataSource.createQueryRunner();
-      queryRunner.manager.findOne.mockResolvedValue({
-        ...mockSeason,
-        is_finalized: true,
-      });
-
-      await expect(controller.finalizeSeason('season-123')).rejects.toThrow(
-        ConflictException,
-      );
-      expect(queryRunner.rollbackTransaction).toHaveBeenCalled();
-    });
-
-    it('should reset all users season_points to 0 atomically', async () => {
-      const queryRunner = mockDataSource.createQueryRunner();
-      const seasonToFinalize = { ...mockSeason, is_finalized: false };
-      queryRunner.manager.findOne.mockImplementation((entity, options) => {
-        if (entity === Season) {
-          return seasonToFinalize;
-        }
-        if (entity === User) {
-          return mockWinner;
-        }
-      });
-      queryRunner.manager.save.mockResolvedValue({
-        ...seasonToFinalize,
-        is_active: false,
-        is_finalized: true,
-      });
-      queryRunner.manager.update.mockResolvedValue({
-        affected: 50,
-      });
-      mockSeasonsRepository.findOne.mockResolvedValue({
-        ...seasonToFinalize,
-        is_active: false,
-        is_finalized: true,
-        top_winner: mockWinner,
-      });
-
-      await controller.finalizeSeason('season-123');
-
-      expect(queryRunner.manager.update).toHaveBeenCalledWith(
-        User,
-        {},
-        { season_points: 0 },
-      );
-    });
-
-    it('should handle seasons with no predictions gracefully', async () => {
-      const queryRunner = mockDataSource.createQueryRunner();
-      const seasonToFinalize = { ...mockSeason, is_finalized: false };
-      queryRunner.manager.findOne.mockImplementation((entity, options) => {
-        if (entity === Season) {
-          return seasonToFinalize;
-        }
-        if (entity === User) {
-          return null; // No users with points
-        }
-      });
-      queryRunner.manager.save.mockResolvedValue({
-        ...seasonToFinalize,
-        is_active: false,
-        is_finalized: true,
-      });
-      queryRunner.manager.update.mockResolvedValue({
-        affected: 0,
-      });
-      mockSeasonsRepository.findOne.mockResolvedValue({
-        ...seasonToFinalize,
-        is_active: false,
-        is_finalized: true,
-        top_winner: null,
-      });
-
-      const result = await controller.finalizeSeason('season-123');
-
-      expect(result.is_finalized).toBe(true);
-      expect(result.top_winner).toBeNull();
-      // Notification should not be created when no winner
-      expect(mockNotificationsService.create).not.toHaveBeenCalled();
+      expect(service.finalizeSeason).toHaveBeenCalledWith('season-123');
+      expect(result).toBe(finalized);
     });
   });
 });

@@ -71,10 +71,10 @@ import { UsersModule } from './users/users.module';
     PredictionsModule,
     CompetitionsModule,
     SeasonsModule,
+    AnalyticsModule,
     LeaderboardModule,
     NotificationsModule,
     SorobanModule,
-    AnalyticsModule,
     CommonModule,
   ],
 

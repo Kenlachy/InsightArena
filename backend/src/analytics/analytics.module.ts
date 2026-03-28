@@ -1,21 +1,15 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { LeaderboardEntry } from '../leaderboard/entities/leaderboard-entry.entity';
 import { Market } from '../markets/entities/market.entity';
 import { Prediction } from '../predictions/entities/prediction.entity';
-import { UsersModule } from '../users/users.module';
-import { MarketsModule } from '../markets/markets.module';
-import { PredictionsModule } from '../predictions/predictions.module';
-import { LeaderboardModule } from '../leaderboard/leaderboard.module';
+import { User } from '../users/entities/user.entity';
 import { AnalyticsController } from './analytics.controller';
 import { AnalyticsService } from './analytics.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Market, Prediction]),
-    UsersModule,
-    MarketsModule,
-    PredictionsModule,
-    LeaderboardModule,
+    TypeOrmModule.forFeature([User, Prediction, LeaderboardEntry, Market]),
   ],
   controllers: [AnalyticsController],
   providers: [AnalyticsService],
