@@ -296,7 +296,7 @@ export class MarketsService {
       content: dto.content,
       author: user,
       market,
-      parent,
+      parent: parent || undefined,
     });
 
     return await this.commentsRepository.save(comment);

@@ -41,7 +41,7 @@ export class Comment {
   is_moderated: boolean;
 
   @Column({ nullable: true })
-  moderation_reason: string;
+  moderation_reason: string | null;
 
   @CreateDateColumn()
   created_at: Date;

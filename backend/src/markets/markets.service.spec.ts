@@ -6,11 +6,13 @@ import { SorobanService } from '../soroban/soroban.service';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import { Market } from './entities/market.entity';
+import { Comment } from './entities/comment.entity';
+import { MarketTemplate } from './entities/market-template.entity';
 import { CreateMarketDto } from './dto/create-market.dto';
 import { MarketsService } from './markets.service';
 
 type MockRepo = jest.Mocked<
-  Pick<Repository<Market>, 'create' | 'save' | 'findOne'>
+  Pick<Repository<Market>, 'create' | 'save' | 'findOne' | 'find'>
 >;
 
 describe('MarketsService', () => {
@@ -43,6 +45,7 @@ describe('MarketsService', () => {
       create: jest.fn(),
       save: jest.fn(),
       findOne: jest.fn(),
+      find: jest.fn(),
     };
 
     sorobanService = {
@@ -55,6 +58,14 @@ describe('MarketsService', () => {
         MarketsService,
         {
           provide: getRepositoryToken(Market),
+          useValue: marketsRepository,
+        },
+        {
+          provide: getRepositoryToken(Comment),
+          useValue: marketsRepository, // reuse marketsRepository mock structure
+        },
+        {
+          provide: getRepositoryToken(MarketTemplate),
           useValue: marketsRepository,
         },
         {

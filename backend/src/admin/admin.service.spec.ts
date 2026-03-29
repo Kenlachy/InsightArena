@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { Comment } from '../markets/entities/comment.entity';
 import { ActivityLog } from '../analytics/entities/activity-log.entity';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { Competition } from '../competitions/entities/competition.entity';
@@ -63,6 +64,7 @@ describe('AdminService.adminResolveMarket', () => {
         AdminService,
         { provide: getRepositoryToken(User), useValue: mockRepo() },
         { provide: getRepositoryToken(Market), useValue: marketsRepo },
+        { provide: getRepositoryToken(Comment), useValue: mockRepo() },
         { provide: getRepositoryToken(Prediction), useValue: predictionsRepo },
         { provide: getRepositoryToken(Competition), useValue: mockRepo() },
         { provide: getRepositoryToken(ActivityLog), useValue: mockRepo() },

@@ -307,7 +307,7 @@ export class AdminService {
     }
 
     comment.is_moderated = isModerated;
-    comment.moderation_reason = reason;
+    comment.moderation_reason = reason ?? null;
 
     return await this.commentsRepository.save(comment);
   }
@@ -359,7 +359,7 @@ export class AdminService {
 
     // Predictions activity
     const predictionsCount = await this.predictionsRepository.count({
-      where: { created_at: Between(startDate, now) },
+      where: { submitted_at: Between(startDate, now) },
     });
 
     const reportData = {

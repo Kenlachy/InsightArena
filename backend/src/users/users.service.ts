@@ -231,7 +231,7 @@ export class UsersService {
         id: n.id,
         type: n.type,
         title: n.title,
-        content: n.content,
+        message: n.message,
         is_read: n.is_read,
         created_at: n.created_at,
       })),
