@@ -19,6 +19,7 @@ import { BanUserDto } from './dto/ban-user.dto';
 import { ActivityLogQueryDto } from './dto/activity-log-query.dto';
 import { StatsResponseDto } from './dto/stats-response.dto';
 import { ResolveMarketDto } from './dto/resolve-market.dto';
+import { ModerateCommentDto } from './dto/moderate-comment.dto';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -76,5 +77,13 @@ export class AdminController {
       dto,
       (req as { user: { id: string } }).user.id,
     );
+  }
+
+  @Patch('comments/:id/moderate')
+  async moderateComment(
+    @Param('id') id: string,
+    @Body() dto: ModerateCommentDto,
+  ) {
+    return this.adminService.moderateComment(id, dto.is_moderated, dto.reason);
   }
 }

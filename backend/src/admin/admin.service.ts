@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import { Market } from '../markets/entities/market.entity';
+import { Comment } from '../markets/entities/comment.entity';
 import { Prediction } from '../predictions/entities/prediction.entity';
 import { Competition } from '../competitions/entities/competition.entity';
 import { ActivityLog } from '../analytics/entities/activity-log.entity';
@@ -31,6 +32,8 @@ export class AdminService {
     private readonly usersRepository: Repository<User>,
     @InjectRepository(Market)
     private readonly marketsRepository: Repository<Market>,
+    @InjectRepository(Comment)
+    private readonly commentsRepository: Repository<Comment>,
     @InjectRepository(Prediction)
     private readonly predictionsRepository: Repository<Prediction>,
     @InjectRepository(Competition)
@@ -283,5 +286,24 @@ export class AdminService {
     );
 
     return saved;
+  }
+
+  async moderateComment(
+    commentId: string,
+    isModerated: boolean,
+    reason?: string,
+  ): Promise<Comment> {
+    const comment = await this.commentsRepository.findOne({
+      where: { id: commentId },
+    });
+
+    if (!comment) {
+      throw new NotFoundException(`Comment with ID "${commentId}" not found`);
+    }
+
+    comment.is_moderated = isModerated;
+    comment.moderation_reason = reason;
+
+    return await this.commentsRepository.save(comment);
   }
 }

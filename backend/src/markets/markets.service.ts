@@ -10,7 +10,9 @@ import { PredictionStatsDto } from './dto/prediction-stats.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Market } from './entities/market.entity';
+import { Comment } from './entities/comment.entity';
 import { CreateMarketDto } from './dto/create-market.dto';
+import { CreateCommentDto } from './dto/create-comment.dto';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import {
@@ -27,6 +29,8 @@ export class MarketsService {
   constructor(
     @InjectRepository(Market)
     private readonly marketsRepository: Repository<Market>,
+    @InjectRepository(Comment)
+    private readonly commentsRepository: Repository<Comment>,
     private readonly usersService: UsersService,
     private readonly sorobanService: SorobanService,
   ) {}
@@ -263,5 +267,75 @@ export class MarketsService {
         'Market cancelled on-chain but failed to update database',
       );
     }
+  }
+
+  /**
+   * Create a comment for a market
+   */
+  async createComment(
+    marketId: string,
+    dto: CreateCommentDto,
+    user: User,
+  ): Promise<Comment> {
+    const market = await this.findByIdOrOnChainId(marketId);
+
+    let parent: Comment | null = null;
+    if (dto.parentId) {
+      parent = await this.commentsRepository.findOne({
+        where: { id: dto.parentId },
+      });
+      if (!parent) {
+        throw new NotFoundException(`Parent comment with ID "${dto.parentId}" not found`);
+      }
+    }
+
+    const comment = this.commentsRepository.create({
+      content: dto.content,
+      author: user,
+      market,
+      parent,
+    });
+
+    return await this.commentsRepository.save(comment);
+  }
+
+  /**
+   * Get all comments for a market, including nested replies
+   */
+  async getComments(marketId: string): Promise<Comment[]> {
+    const market = await this.findByIdOrOnChainId(marketId);
+
+    // Fetch all comments for this market
+    const comments = await this.commentsRepository.find({
+      where: { market: { id: market.id } },
+      relations: ['author', 'parent'],
+      order: { created_at: 'ASC' },
+    });
+
+    // Build nested structure
+    const commentMap = new Map<string, Comment & { replies: Comment[] }>();
+    const roots: Comment[] = [];
+
+    comments.forEach((c) => {
+      const commentWithReplies = { ...c, replies: [] };
+      commentMap.set(c.id, commentWithReplies);
+    });
+
+    comments.forEach((c) => {
+      const commentWithReplies = commentMap.get(c.id)!;
+      if (c.parent) {
+        const parent = commentMap.get(c.parent.id);
+        if (parent) {
+          parent.replies.push(commentWithReplies);
+        } else {
+          // Parent might not be in this market, which shouldn't happen
+          roots.push(commentWithReplies);
+        }
+      } else {
+        roots.push(commentWithReplies);
+      }
+    });
+
+    return roots;
   }
 }

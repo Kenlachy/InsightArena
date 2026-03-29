@@ -20,7 +20,9 @@ import {
 } from '@nestjs/swagger';
 import { MarketsService } from './markets.service';
 import { Market } from './entities/market.entity';
+import { Comment } from './entities/comment.entity';
 import { CreateMarketDto } from './dto/create-market.dto';
+import { CreateCommentDto } from './dto/create-comment.dto';
 import {
   ListMarketsDto,
   PaginatedMarketsResponse,
@@ -105,5 +107,33 @@ export class MarketsController {
   @ApiResponse({ status: 502, description: 'Soroban contract call failed' })
   async cancelMarket(@Param('id') id: string): Promise<Market> {
     return this.marketsService.cancelMarket(id);
+  }
+
+  @Post(':id/comments')
+  @UseGuards(BanGuard)
+  @HttpCode(HttpStatus.CREATED)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Post a comment on a market' })
+  @ApiResponse({ status: 201, description: 'Comment posted', type: Comment })
+  @ApiResponse({ status: 404, description: 'Market/Parent not found' })
+  async postComment(
+    @Param('id') id: string,
+    @Body() dto: CreateCommentDto,
+    @CurrentUser() user: User,
+  ): Promise<Comment> {
+    return this.marketsService.createComment(id, dto, user);
+  }
+
+  @Get(':id/comments')
+  @Public()
+  @ApiOperation({ summary: 'Get comments for a market' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of comments (nested structure)',
+    type: [Comment],
+  })
+  @ApiResponse({ status: 404, description: 'Market not found' })
+  async getComments(@Param('id') id: string): Promise<Comment[]> {
+    return this.marketsService.getComments(id);
   }
 }
