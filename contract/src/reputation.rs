@@ -1,9 +1,8 @@
-use soroban_sdk::{Address, Env};
+use soroban_sdk::{Address, Env, Vec};
 
 use crate::config::{PERSISTENT_BUMP, PERSISTENT_THRESHOLD};
 use crate::errors::InsightArenaError;
-use crate::storage_types::{CreatorStats, DataKey, CreatorLeaderboardEntry};
-
+use crate::storage_types::{CreatorLeaderboardEntry, CreatorStats, DataKey};
 
 // ── Storage helpers ───────────────────────────────────────────────────────────
 
@@ -146,20 +145,24 @@ pub fn get_top_creators(env: &Env, limit: u32) -> Vec<CreatorLeaderboardEntry> {
     creators
 }
 
-pub fn reset_creator_stats(env: &Env, admin: Address, creator: Address) -> Result<(), InsightArenaError> {
+pub fn reset_creator_stats(
+    env: &Env,
+    admin: Address,
+    creator: Address,
+) -> Result<(), InsightArenaError> {
     admin.require_auth();
     let cfg = crate::config::get_config(env)?;
     if admin != cfg.admin {
         return Err(InsightArenaError::Unauthorized);
     }
-    
+
     let mut stats = load_stats(env, &creator);
     stats.markets_created = 0;
     stats.markets_resolved = 0;
     stats.average_participant_count = 0;
     stats.dispute_count = 0;
     stats.reputation_score = 0;
-    
+
     save_stats(env, &creator, &stats);
     Ok(())
 }

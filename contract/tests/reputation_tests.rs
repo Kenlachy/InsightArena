@@ -350,7 +350,7 @@ fn test_reset_creator_stats_reputation_becomes_zero() {
     assert!(stats_before.reputation_score > 0);
 
     client.reset_creator_stats(&admin, &creator);
-    
+
     let stats_after = client.get_creator_stats(&creator);
     assert_eq!(stats_after.reputation_score, 0);
 }
@@ -387,11 +387,11 @@ fn test_get_top_creators_returns_sorted_by_reputation() {
     let id3 = client.create_market(&creator2, &default_params(&env));
     client.resolve_market(&oracle, &id2, &symbol_short!("yes"));
     client.resolve_market(&oracle, &id3, &symbol_short!("no"));
-    // Manual stats update for simplicity in testing if needed, 
+    // Manual stats update for simplicity in testing if needed,
     // but resolving with participants would be better.
-    // Wait, on_market_resolved takes participant_count. 
+    // Wait, on_market_resolved takes participant_count.
     // In our resolve_market call, it uses market.participant_count which is 0 by default.
-    
+
     // Let's just use different resolution ratios.
     // Creator 1: 1/1 = 600
     // Creator 3: 1/2 = (1/2)*600 = 300
@@ -404,7 +404,7 @@ fn test_get_top_creators_returns_sorted_by_reputation() {
     assert_eq!(top.get(0).unwrap().address, creator1); // 600
     assert_eq!(top.get(1).unwrap().address, creator2); // 600 (depends on order if same)
     assert_eq!(top.get(2).unwrap().address, creator3); // 300
-    
+
     assert_eq!(top.get(0).unwrap().stats.reputation_score, 600);
     assert_eq!(top.get(2).unwrap().stats.reputation_score, 300);
 }
@@ -422,7 +422,7 @@ fn test_get_top_creators_respects_limit() {
 
     let top = client.get_top_creators(&3);
     assert_eq!(top.len(), 3);
-    
+
     let top_more = client.get_top_creators(&10);
     assert_eq!(top_more.len(), 5);
 }

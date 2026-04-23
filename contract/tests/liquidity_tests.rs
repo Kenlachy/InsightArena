@@ -695,8 +695,6 @@ fn test_pool_volume_returns_zero_for_unknown_market() {
     assert_eq!(client.get_pool_volume_24h(&999), 0);
 }
 
- 
-
 #[test]
 fn test_get_swap_history_empty_before_any_swaps() {
     let env = Env::default();
@@ -706,4 +704,3 @@ fn test_get_swap_history_empty_before_any_swaps() {
     let history = client.get_swap_history(&123);
     assert_eq!(history.len(), 0);
 }
- 
