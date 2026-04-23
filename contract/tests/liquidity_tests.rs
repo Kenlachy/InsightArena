@@ -673,8 +673,8 @@ fn create_market_params(env: &Env, now: u64) -> CreateMarketParams {
         resolution_time: now + 2000,
         dispute_window: 1000,
         creator_fee_bps: 0,
-        min_stake: 10,
-        max_stake: 1000000,
+        min_stake: 10_000_000,
+        max_stake: 100_000_000,
         is_public: true,
     }
 }
@@ -705,11 +705,11 @@ fn test_pool_volume_accumulates_after_swaps() {
     client.add_category(&admin, &Symbol::new(&env, "Cat"));
     let market_id = client.create_market(&creator, &create_market_params(&env, env.ledger().timestamp()));
     
-    client.add_liquidity(&creator, &market_id, &100_000);
-    client.swap_outcome(&creator, &market_id, &symbol_short!("A"), &symbol_short!("B"), &1000, &0);
-    client.swap_outcome(&creator, &market_id, &symbol_short!("B"), &symbol_short!("A"), &500, &0);
+    client.add_liquidity(&creator, &market_id, &20_000_000);
+    client.swap_outcome(&creator, &market_id, &symbol_short!("A"), &symbol_short!("B"), &10_000_000, &0);
+    client.swap_outcome(&creator, &market_id, &symbol_short!("B"), &symbol_short!("A"), &10_000_000, &0);
 
-    assert_eq!(client.get_pool_volume_24h(&market_id), 1500);
+    assert_eq!(client.get_pool_volume_24h(&market_id), 20_000_000);
 }
 
 #[test]
@@ -732,9 +732,9 @@ fn test_get_swap_history_returns_all_swaps() {
     client.add_category(&admin, &Symbol::new(&env, "Cat"));
     let market_id = client.create_market(&creator, &create_market_params(&env, env.ledger().timestamp()));
     
-    client.add_liquidity(&creator, &market_id, &100_000);
-    client.swap_outcome(&creator, &market_id, &symbol_short!("A"), &symbol_short!("B"), &1000, &0);
-    client.swap_outcome(&creator, &market_id, &symbol_short!("B"), &symbol_short!("A"), &500, &0);
+    client.add_liquidity(&creator, &market_id, &20_000_000);
+    client.swap_outcome(&creator, &market_id, &symbol_short!("A"), &symbol_short!("B"), &10_000_000, &0);
+    client.swap_outcome(&creator, &market_id, &symbol_short!("B"), &symbol_short!("A"), &10_000_000, &0);
 
     let history = client.get_swap_history(&market_id);
     assert_eq!(history.len(), 2);
@@ -750,13 +750,13 @@ fn test_get_swap_history_records_correct_amounts() {
     client.add_category(&admin, &Symbol::new(&env, "Cat"));
     let market_id = client.create_market(&creator, &create_market_params(&env, env.ledger().timestamp()));
     
-    client.add_liquidity(&creator, &market_id, &100_000);
-    client.swap_outcome(&creator, &market_id, &symbol_short!("A"), &symbol_short!("B"), &1000, &0);
+    client.add_liquidity(&creator, &market_id, &20_000_000);
+    client.swap_outcome(&creator, &market_id, &symbol_short!("A"), &symbol_short!("B"), &10_000_000, &0);
 
     let history = client.get_swap_history(&market_id);
     let swap = history.get(0).unwrap();
     
-    assert_eq!(swap.amount_in, 1000);
+    assert_eq!(swap.amount_in, 10_000_000);
     assert_eq!(swap.from_outcome, symbol_short!("A"));
     assert_eq!(swap.to_outcome, symbol_short!("B"));
 }
