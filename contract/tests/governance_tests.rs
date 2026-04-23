@@ -1,7 +1,7 @@
 use insightarena_contract::governance::ProposalType;
 use insightarena_contract::storage_types::DataKey;
 use insightarena_contract::{InsightArenaContract, InsightArenaContractClient};
-use soroban_sdk::testutils::Address as _;
+use soroban_sdk::testutils::{Address as _, Ledger as _};
 use soroban_sdk::{Address, Env, Symbol, Vec};
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -142,7 +142,7 @@ fn test_execute_proposal_updates_protocol_fee() {
     let executor = Address::generate(&env);
     client.execute_proposal(&executor, &id);
 
-    let cfg = client.get_config().unwrap();
+    let cfg = client.get_config();
     assert_eq!(cfg.protocol_fee_bps, 500);
 }
 
@@ -164,7 +164,7 @@ fn test_execute_proposal_updates_oracle() {
     let executor = Address::generate(&env);
     client.execute_proposal(&executor, &id);
 
-    let cfg = client.get_config().unwrap();
+    let cfg = client.get_config();
     assert_eq!(cfg.oracle_address, new_oracle);
 }
 
@@ -186,7 +186,7 @@ fn test_execute_proposal_updates_min_stake() {
     let executor = Address::generate(&env);
     client.execute_proposal(&executor, &id);
 
-    let cfg = client.get_config().unwrap();
+    let cfg = client.get_config();
     assert_eq!(cfg.min_stake_xlm, new_min);
 }
 
