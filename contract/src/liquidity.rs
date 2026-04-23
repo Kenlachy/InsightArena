@@ -453,7 +453,7 @@ pub fn update_pool_volume(env: &Env, market_id: u64, amount: i128) {
 
     let now = env.ledger().timestamp();
     let twenty_four_hours: u64 = 24 * 60 * 60;
-    let cutoff = if now > twenty_four_hours { now - twenty_four_hours } else { 0 };
+    let cutoff = now.saturating_sub(twenty_four_hours);
 
     let mut new_entries = Vec::new(env);
     for entry in volume_entries.iter() {
@@ -480,7 +480,7 @@ pub fn get_pool_volume_24h(env: &Env, market_id: u64) -> i128 {
 
     let now = env.ledger().timestamp();
     let twenty_four_hours: u64 = 24 * 60 * 60;
-    let cutoff = if now > twenty_four_hours { now - twenty_four_hours } else { 0 };
+    let cutoff = now.saturating_sub(twenty_four_hours);
 
     let mut total: i128 = 0;
     for entry in volume_entries.iter() {
