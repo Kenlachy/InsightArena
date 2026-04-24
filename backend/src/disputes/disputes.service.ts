@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException, ConflictException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, LessThan } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Dispute, DisputeStatus, DisputeResolution } from './entities/dispute.entity';
 import { CreateDisputeDto } from './dto/create-dispute.dto';
 import { ResolveDisputeDto } from './dto/resolve-dispute.dto';
@@ -147,7 +147,7 @@ export class DisputesService {
 
   async findByMarket(marketId: string): Promise<Dispute[]> {
     return this.disputesRepository.find({
-      where: { market_id },
+      where: { market_id: marketId },
       relations: ['disputant', 'resolved_by'],
       order: { created_at: 'DESC' },
     });

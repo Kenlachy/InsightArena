@@ -29,7 +29,6 @@ export class AdminDisputesController {
 
   @Post(':id/resolve')
   @Roles(Role.Admin)
-  @UseGuards()
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Resolve a dispute (admin only)' })

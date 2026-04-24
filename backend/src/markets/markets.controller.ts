@@ -26,6 +26,8 @@ import { BanGuard } from '../common/guards/ban.guard';
 import { User } from '../users/entities/user.entity';
 import { BulkCreateMarketsDto } from './dto/bulk-create-markets.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { CreateDisputeDto } from '../disputes/dto/create-dispute.dto';
+import { ResolveDisputeDto } from '../disputes/dto/resolve-dispute.dto';
 import { CreateMarketDto } from './dto/create-market.dto';
 import { UpdateMarketDto } from './dto/update-market.dto';
 import {
@@ -311,7 +313,7 @@ export class MarketsController {
     @CurrentUser() user: User,
   ) {
     // Create dispute DTO with market ID
-    const disputeDto = {
+    const disputeDto: CreateDisputeDto = {
       market_id: id,
       reason: createDisputeDto.reason,
     };
