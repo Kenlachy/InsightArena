@@ -126,7 +126,7 @@ export class DisputesService {
 
     // If dispute is upheld (overturn original outcome), update market
     if (resolution === DisputeResolution.UPHELD) {
-      await this.handleOverturnedMarket(dispute.market);
+      this.handleOverturnedMarket(dispute.market);
     }
 
     return this.findOne(id);
@@ -176,7 +176,7 @@ export class DisputesService {
     };
   }
 
-  private async handleOverturnedMarket(market: Market): Promise<void> {
+  private handleOverturnedMarket(market: Market): void {
     // For upheld disputes, we might need to handle refunds or other logic
     // This is a placeholder for any additional business logic needed
     // when a market outcome is overturned

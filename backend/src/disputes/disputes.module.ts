@@ -6,9 +6,10 @@ import { DisputesController } from './disputes.controller';
 import { AdminDisputesController } from './admin-disputes.controller';
 import { Market } from '../markets/entities/market.entity';
 import { User } from '../users/entities/user.entity';
+import { SorobanModule } from '../soroban/soroban.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Dispute, Market, User])],
+  imports: [TypeOrmModule.forFeature([Dispute, Market, User]), SorobanModule],
   controllers: [DisputesController, AdminDisputesController],
   providers: [DisputesService],
   exports: [DisputesService],
