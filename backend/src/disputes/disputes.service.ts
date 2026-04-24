@@ -126,7 +126,7 @@ export class DisputesService {
 
     // If dispute is upheld (overturn original outcome), update market
     if (resolution === DisputeResolution.UPHELD) {
-      await this.handleOverturnedMarket(dispute.market);
+      this.handleOverturnedMarket(dispute.market);
     }
 
     return this.findOne(id);
