@@ -119,7 +119,7 @@ describe('SorobanService', () => {
           result: { auth: [] },
           minResourceFee: '100',
           _parsed: true,
-        } as any);
+        });
 
       jest
         .spyOn(SorobanRpc.Server.prototype, 'sendTransaction')
