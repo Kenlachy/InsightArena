@@ -176,7 +176,7 @@ export class DisputesService {
     };
   }
 
-  private async handleOverturnedMarket(market: Market): Promise<void> {
+  private handleOverturnedMarket(market: Market): void {
     // For upheld disputes, we might need to handle refunds or other logic
     // This is a placeholder for any additional business logic needed
     // when a market outcome is overturned
